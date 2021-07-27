@@ -1,13 +1,38 @@
-const mongoose = require("mongoose");
+const connection = require("./model");
+const express = require("express");
+const application = express();
+const path = require("path");
+const expressHandlerbars = require("express-handlebars");
+const bodyparser = require("body-parser");
 
-mongoose.connect(
-  "mongodb://localhost:27017/Edureka",
-  { useNewUrlParser: true },
-  (error) => {
-    if (!error) {
-      console.log("Successfully connected");
-    } else {
-      console.log("Error connecting to database");
-    }
-  }
+const Coursecontroller = require("./controllers/courses");
+
+application.use(
+  bodyparser.urlencoded({
+    extended: true,
+  })
 );
+
+application.set("views", path.join(__dirname, "/views/"));
+
+application.engine(
+  "hbs",
+  expressHandlerbars({
+    extname: "hbs",
+    defaultLayout: "mainlayout",
+    layoutsDir: __dirname + "/views/layouts",
+  })
+);
+
+application.set("view engine", "hbs");
+
+application.get("/", (req, res) => {
+  //   res.send("<he>Hello World</h1>");
+  res.render("index", {});
+});
+
+application.use("/course", Coursecontroller);
+
+application.listen("3000", () => {
+  console.log("Server started");
+});
